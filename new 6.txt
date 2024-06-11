@@ -1,0 +1,343 @@
+Countdown Timer: Write a script that uses a while loop to countdown from 10 to 1, printing each number on a new line, and then displays "Boom!" when the countdown reaches zero.
+
+
+#!/bin/bash
+
+# Set the starting time (seconds)
+time_to_count=10
+
+# Loop through the countdown
+while [[ $time_to_count -ge 1 ]]; do
+  # Print the remaining time on a new line
+  echo "$time_to_count"
+  # Decrement the time counter
+  ((time_to_count--))
+
+  # Introduce a one-second delay (modify as needed)
+  sleep 1
+done
+
+# Display the final message
+echo "Boom!"
+
+
+User Input Validation: Create a script that prompts the user to enter a positive number. Use a while loop to continuously prompt the user until a positive number is entered.
+
+
+#!/bin/bash
+# Function to validate user input
+validate_number() {
+  local number="$1"
+  # Check if the input is a number and greater than zero
+  if [[ ! -z "$number" && "$number" -gt 0 ]]; then
+    echo "Valid positive number entered: $number"
+    return 0  # Indicate successful validation (exit code 0)
+  else
+    echo "Invalid input. Please enter a positive number."
+    return 1  # Indicate invalid input (exit code 1)
+  fi
+}
+
+# Loop until a valid number is entered
+while true; do
+  read -p "Enter a positive number: " number
+
+  # Call the validation function and check its return code
+  if validate_number "$number"; then
+    break  # Exit the loop if validation is successful
+  fi
+done
+echo "You have entered a valid positive number."
+
+
+
+File Processing: Write a script that reads each line from a file named data.txt and displays each line preceded by a line number, using a while loop.
+
+
+#!/bin/bash
+
+# Define the filename
+file_name="data.txt"
+
+# Check if the file exists
+if [ ! -f "$file_name" ]; then
+  echo "Error: File '$file_name' does not exist."
+  exit 1
+fi
+
+# Loop through each line in the file
+line_number=1
+while read -r line; do
+  # Print line number and content
+  echo "$line_number: $line"
+  ((line_number++))  # Increment line number for the next iteration
+done < "$file_name"
+
+echo "Finished processing file."
+
+
+Directory Traversal: Create a script that traverses through all files in a directory and its subdirectories, displaying the name and size of each file.
+
+
+#!/bin/bash
+
+# Function to process files
+process_file() {
+  local filename="$1"
+  # Check if it's a regular file (avoid directories or special files)
+  if [[ -f "$filename" ]]; then
+    # Get file size in human-readable format
+    file_size=$(stat -c "%s" "$filename")  # Use stat command with %s for size
+    echo "$filename: $file_size bytes"
+  fi
+}
+
+# Function to traverse directory recursively
+traverse_directory() {
+  local directory="$1"
+  # Loop through all entries in the directory
+  for entry in "$directory"/*; do
+    # Check if it's a directory (avoid processing the current directory)
+    if [[ -d "$entry" && "$entry" != "." ]]; then
+      # Recursively traverse subdirectories
+      traverse_directory "$entry"
+    else
+      # Process the file (call the process_file function)
+      process_file "$entry"
+    fi
+  done
+}
+
+# Get the directory path from the user (optional)
+# read -p "Enter directory path (or use current directory): " directory
+
+# Default to the current directory if no input provided
+directory="${1:-$PWD}"
+
+# Check if the directory exists
+if [ ! -d "$directory" ]; then
+  echo "Error: Directory '$directory' does not exist."
+  exit 1
+fi
+
+# Start the directory traversal
+echo "Processing files in '$directory':"
+traverse_directory "$directory"
+
+
+
+Menu System: Implement a simple menu system using a while loop, where the user can select options such as "Add", "Delete", "View", and "Exit". The loop should continue until the user chooses to exit.
+
+
+#!/bin/bash
+
+# Function to display the menu
+display_menu() {
+  echo "Menu:"
+  echo "1. Add"
+  echo "2. Delete"
+  echo "3. View"
+  echo "4. Exit"
+}
+
+# Main loop
+while true; do
+  # Display the menu
+  display_menu
+
+  # Read user choice
+  read -p "Enter your choice (1-4): " choice
+
+  # Validate and handle user choice
+  case $choice in
+    1) echo "Add operation selected (not implemented yet)";;
+    2) echo "Delete operation selected (not implemented yet)";;
+    3) echo "View operation selected (not implemented yet)";;
+    4) echo "Exiting..."; break;;
+    *) echo "Invalid choice. Please enter a number between 1 and 4.";
+  esac
+done
+
+echo "Goodbye!"
+
+
+
+
+Password Validation: Write a script that prompts the user to enter a password. Use a while loop to repeatedly prompt the user until a valid password (e.g., at least 8 characters with a mix of letters, numbers, and special characters) is entered.
+
+
+#!/bin/bash
+
+# Minimum password length
+min_length=8
+
+# Password complexity requirements (modify as needed)
+require_upper=1  # At least one uppercase letter
+require_lower=1  # At least one lowercase letter
+require_number=1  # At least one number
+require_special=1  # At least one special character
+
+# Function to check password complexity
+check_complexity() {
+  local password="$1"
+  # Check password length
+  if [[ ${#password} -lt $min_length ]]; then
+    echo "Password must be at least $min_length characters long."
+    return 1
+  fi
+
+  # Check for uppercase letter (modify regex pattern as needed)
+  if [[ $require_upper -eq 1 && ! [[ "$password" =~ [A-Z] ]] ]]; then
+    echo "Password must contain at least one uppercase letter (A-Z)."
+    return 1
+  fi
+
+  # Check for lowercase letter (modify regex pattern as needed)
+  if [[ $require_lower -eq 1 && ! [[ "$password" =~ [a-z] ]] ]]; then
+    echo "Password must contain at least one lowercase letter (a-z)."
+    return 1
+  fi
+
+  # Check for number (modify regex pattern as needed)
+  if [[ $require_number -eq 1 && ! [[ "$password" =~ [0-9] ]] ]]; then
+    echo "Password must contain at least one number (0-9)."
+    return 1
+  fi
+
+  # Check for special character (modify regex pattern as needed)
+  if [[ $require_special -eq 1 && ! [[ "$password" =~ [~!@#$%^&*_] ]] ]]; then
+    echo "Password must contain at least one special character (~!@#$%^&*_) ."
+    return 1
+  fi
+
+  # Password meets all requirements
+  return 0
+}
+
+# Loop until a valid password is entered
+while true; do
+  # Prompt the user for password (consider using read -s for hidden input)
+  read -p "Enter a strong password: " password
+
+  # Validate the password complexity
+  if check_complexity "$password"; then
+    continue  # Loop back if password is invalid
+  fi
+
+  # Password is valid, exit the loop
+  echo "Valid password entered."
+  break
+done
+
+
+
+Process Monitoring: Create a script that continuously monitors a specific process (identified by its name or PID) using a while loop. Display a message if the process stops running.
+Downloading Files: Write a script that downloads multiple files from a list of URLs stored in a file named urls.txt. Use a while loop to read each URL from the file and download the corresponding file using wget or curl.
+
+
+#!/bin/bash
+
+# Get the process name or PID (modify as needed)
+process_name="myprocess"  # Replace with the actual process name
+# process_pid=12345  # Uncomment and replace with the PID if using PID
+
+# Function to check process status
+check_process() {
+  local process_id="$1"
+  # Use ps to check if the process is running
+  if [[ $(ps -eo pid | grep -q "$process_id") -eq 0 ]]; then
+    echo "Process '$process_name' (PID: $process_id) is not running!"
+  fi
+}
+
+# Choose between checking by name or PID (comment out unused lines)
+if [[ -n "$process_name" ]]; then
+  process_id=$(pgrep -f "$process_name")  # Get PID by process name
+  check_process "$process_id"
+else
+  check_process "$process_pid"  # Use provided PID
+fi
+
+# Monitor the process continuously
+while true; do
+  sleep 5  # Adjust the sleep time as needed (check every 5 seconds)
+  # Check the process status again in the loop
+  if [[ -n "$process_name" ]]; then
+    process_id=$(pgrep -f "$process_name")
+    check_process "$process_id"
+  else
+    check_process "$process_pid"
+  fi
+done
+
+
+
+
+Input File Existence Check: Implement a script that prompts the user to enter the name of a file. Use a while loop to check if the file exists in the current directory. If the file does not exist, prompt the user to enter the filename again.
+
+
+#!/bin/bash
+
+# Loop until a valid filename is entered
+while true; do
+  # Prompt the user for the filename
+  read -p "Enter the name of a file: " filename
+
+  # Check if the file exists
+  if [ -f "$filename" ]; then
+    echo "File '$filename' exists."
+    break  # Exit the loop if the file is found
+  else
+    echo "Error: File '$filename' does not exist. Please try again."
+  fi
+done
+
+
+
+
+Backup Script: Create a backup script that continuously monitors a directory for changes using a while loop. Whenever a new file is added to the directory, the script should automatically create a backup of that file in a separate directory.
+
+#!/bin/bash
+
+
+source_dir="$1"
+backup_dir="$HOME/backups"
+
+create_backup() {
+  local filename="$1"
+  local backup_file="$backup_dir/$(date +%Y-%m-%d_%H-%M-%S)_$filename"
+  cp "$source_dir/$filename" "$backup_file"
+  echo "Backup created: $backup_file"
+}
+
+if [ ! -d "$source_dir" ]; then
+  echo "Error: Directory '$source_dir' does not exist."
+  exit 1
+fi
+
+if [ ! -d "$backup_dir" ]; then
+  mkdir -p "$backup_dir"
+  echo "Backup directory created: $backup_dir"
+fi
+
+
+source_files=$(ls -t "$source_dir")  # Get most recent files first
+
+
+while true; do
+ 
+  current_files=$(ls -t "$source_dir")
+
+  
+  diff --new <(echo "$source_files") <(echo "$source_files") | grep -v '^$' | while read -r new_file; do
+    create_backup "$new_file"  # Create backup for each new file
+  done
+
+  
+  source_files="$current_files"
+
+
+  sleep 1
+done
+
+
